@@ -1,5 +1,9 @@
 from src.scraper import WikipediaScraper  # Import the WikipediaScraper class from the scraper module within the src package.
+from opentelemetry import trace
 
+tracer = trace.get_tracer("mytracer")
+
+@tracer.start_as_current_span("main")
 def main():
     # Create an instance of the WikipediaScraper class.
     # This object will be used to call methods to interact with the web scraping API.

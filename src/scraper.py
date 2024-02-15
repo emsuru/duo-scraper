@@ -3,6 +3,10 @@ from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import json
 import re
+from opentelemetry import trace
+
+tracer = trace.get_tracer("mytracer")
+
 
 class WikipediaScraper:
     """
@@ -39,6 +43,7 @@ class WikipediaScraper:
             self.cookie = None # This refreshes the cookie
         pass
 
+    @tracer.start_as_current_span("get_countries")
     def get_countries(self):
         """
         Fetches a list of countries from the API.
@@ -68,6 +73,7 @@ class WikipediaScraper:
             return None
         # The 'pass' statement is unnecessary here and can be removed
 
+    @tracer.start_as_current_span("get_leaders")
     def get_leaders(self, country):
         """
         Fetches leaders for a given country from the API and stores their data.
@@ -118,6 +124,7 @@ class WikipediaScraper:
             self.leaders_data[country] = []
         # The 'pass' statement is unnecessary here and can be removed
 
+    @tracer.start_as_current_span("get_paragraph_containing_names")
     def get_paragraph_containing_names(self, wikipedia_url, first_name, last_name):
         """
         Fetches and returns the first paragraph that contains both the first name and the last name from a Wikipedia page.
@@ -178,6 +185,8 @@ class WikipediaScraper:
             # If a request exception occurs, log the error and return an empty string
             print(f"An error occurred while getting paragraphs from Wikipedia: {e}")
             return ""
+
+    @tracer.start_as_current_span("to_json_file")
     def to_json_file(self, filepath):
         """
         Saves the collected leaders' data to a JSON file.
