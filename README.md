@@ -69,7 +69,7 @@ My main challenges and opportunities to learn while doing the project were:
 As part of the class project's "nice-to-have" requirements, I created a separate repo branch for upgrades called `feature/o11y`.
 In there I experiment with concurrency to improve runtime and with observability (o11y) via Honeycomb.
 
-Shoutout to [1101](https://github.com/one1zero1one) for his advice and help with these experiments.
+Shoutout to [11011](https://github.com/one1zero1one) for his advice and help with these experiments.
 
 ---
 
