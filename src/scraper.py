@@ -118,18 +118,20 @@ class WikipediaScraper:
             self.leaders_data[country] = []
         # The 'pass' statement is unnecessary here and can be removed
 
-    def get_first_paragraph(self, wikipedia_url):
+    def get_paragraph_containing_names(self, wikipedia_url, first_name, last_name):
         """
-        Fetches and returns the first paragraph from a Wikipedia page.
-        This method makes a GET request to the provided Wikipedia URL, parses the response
-        content using BeautifulSoup to find the first paragraph, and returns its text.
-        If the request fails or the first paragraph is not found, it logs an error and returns an empty string.
+        Fetches and returns the first paragraph that contains both the first name and the last name from a Wikipedia page.
+        This method makes a GET request to the provided Wikipedia URL, parses the response content using BeautifulSoup
+        to find all paragraphs, and returns the text of the first paragraph that contains both the first name and the last name.
+        If the request fails or no such paragraph is found, it logs an error and returns an empty string.
 
         Args:
             wikipedia_url (str): The URL of the Wikipedia page to scrape.
+            first_name (str): The first name to search for within the paragraphs.
+            last_name (str): The last name to search for within the paragraphs.
 
         Returns:
-            str: The first paragraph of the Wikipedia page, or an empty string if not found.
+            str: The first paragraph containing both the first name and the last name on the Wikipedia page, or an empty string if not found.
         """
         try:
             # Make a GET request to the provided Wikipedia URL
@@ -138,31 +140,44 @@ class WikipediaScraper:
             response.raise_for_status()
             # Parse the response content using BeautifulSoup to navigate the HTML structure
             soup = BeautifulSoup(response.content, 'html.parser')
-            # Attempt to find the first paragraph by looking for the 'p' tag within the main content of the page
+            # Attempt to find all paragraphs by looking for the 'p' tags within the main content of the page
             # The main content can be identified by the 'mw-content-text' ID or 'mw-parser-output' class
             content = soup.find(id='mw-content-text') or soup.find(class_='mw-parser-output')
 
-            # Use prettify() to print the formatted HTML of the main content (useful for debugging)
-            # print(content.prettify())
+            # Find all 'p' tags in the content
+            paragraphs = content.find_all('p') if content else []
 
-            first_paragraph = content.find('p') if content else None
-            # If a paragraph is found, clean it up and return the text
-            if first_paragraph:
+            first_non_empty_paragraph = None
+            # Iterate through the found paragraphs to find the first one that contains both the first name and the last name
+            for paragraph in paragraphs:
                 # Get the text content of the paragraph, stripping whitespace
-                paragraph_text = first_paragraph.get_text(strip=True)
+                paragraph_text = paragraph.get_text(strip=True)
                 # Use a regular expression to remove citation numbers (e.g., [1], [2], etc.)
                 clean_text = re.sub(r'\[\d+\]', '', paragraph_text)
-                return clean_text
+
+                # Store the first non-empty paragraph in case no paragraph containing both names is found
+                if not first_non_empty_paragraph and clean_text:
+                    first_non_empty_paragraph = clean_text
+
+                # Check if the paragraph contains both the first name and the last name
+                if last_name == "None" or last_name is None:
+                    if first_name in clean_text:
+                        return clean_text
+                else:
+                    if first_name in clean_text and last_name in clean_text:
+                        return clean_text
+
+            # If no paragraph containing both names is found, return the first non-empty paragraph
+            if first_non_empty_paragraph:
+                return first_non_empty_paragraph
             else:
-                # If no paragraph is found, log a message indicating the issue and return an empty string
-                print(f"No paragraph found in the main content for URL: {wikipedia_url}")
+                # If there are no non-empty paragraphs, log an error and return an empty string
+                print(f"No non-empty paragraph found for URL: {wikipedia_url}")
                 return ""
         except RequestException as e:
             # If a request exception occurs, log the error and return an empty string
-            print(f"An error occurred while getting the first paragraph from Wikipedia: {e}")
+            print(f"An error occurred while getting paragraphs from Wikipedia: {e}")
             return ""
-        # The 'pass' statement is unnecessary here and can be removed
-
     def to_json_file(self, filepath):
         """
         Saves the collected leaders' data to a JSON file.

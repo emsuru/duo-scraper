@@ -33,7 +33,7 @@ def main():
                 # Check if the leader has a 'wikipedia_url' key and that it is not empty.
                 # This ensures that we only attempt to fetch data for leaders with a valid Wikipedia URL.
                 if 'wikipedia_url' in leader and leader['wikipedia_url']:
-                    first_paragraph = scraper.get_first_paragraph(leader['wikipedia_url'])
+                    first_paragraph = scraper.get_paragraph_containing_names(leader['wikipedia_url'], leader['first_name'], leader['last_name'])
                     leader['first_paragraph'] = first_paragraph
                     print(f"First paragraph for {leader['first_name']} {leader['last_name']}: {first_paragraph}")
 
