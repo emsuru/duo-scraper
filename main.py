@@ -17,7 +17,8 @@ def main():
 
     # Call the get_countries method on the scraper object to fetch a list of countries from the API.
     # The returned value is stored in the 'countries' variable.
-    countries = scraper.get_countries()
+    with tracer.start_as_current_span("get_countries"):
+        countries = scraper.get_countries()
     # Print the list of countries to verify that the data has been fetched successfully.
     print(f"Countries: {countries}")
 
@@ -26,20 +27,22 @@ def main():
     if countries:
         # Iterate over each country in the list of countries.
         for country in countries:
-            # Call the get_leaders method on the scraper object to fetch leaders' data for the current country.
-            # The data is stored within the scraper object's leaders_data attribute.
-            scraper.get_leaders(country)
-            # Print the leaders' data for the current country to verify that it has been fetched successfully.
-            print(f"Leaders of {country}: {scraper.leaders_data[country]}")
+            with tracer.start_as_current_span("each_country"):
+                # Call the get_leaders method on the scraper object to fetch leaders' data for the current country.
+                # The data is stored within the scraper object's leaders_data attribute.
+                scraper.get_leaders(country)
+                # Print the leaders' data for the current country to verify that it has been fetched successfully.
+                print(f"Leaders of {country}: {scraper.leaders_data[country]}")
 
-            # Iterate over each leader in the list of leaders for the current country.
-            for leader in scraper.leaders_data[country]:
-                # Check if the leader has a 'wikipedia_url' key and that it is not empty.
-                # This ensures that we only attempt to fetch data for leaders with a valid Wikipedia URL.
-                if 'wikipedia_url' in leader and leader['wikipedia_url']:
-                    first_paragraph = scraper.get_paragraph_containing_names(leader['wikipedia_url'], leader['first_name'], leader['last_name'])
-                    leader['first_paragraph'] = first_paragraph
-                    print(f"First paragraph for {leader['first_name']} {leader['last_name']}: {first_paragraph}")
+                # Iterate over each leader in the list of leaders for the current country.
+                for leader in scraper.leaders_data[country]:
+                    with tracer.start_as_current_span("each_leader"):
+                        # Check if the leader has a 'wikipedia_url' key and that it is not empty.
+                        # This ensures that we only attempt to fetch data for leaders with a valid Wikipedia URL.
+                        if 'wikipedia_url' in leader and leader['wikipedia_url']:
+                            first_paragraph = scraper.get_paragraph_containing_names(leader['wikipedia_url'], leader['first_name'], leader['last_name'])
+                            leader['first_paragraph'] = first_paragraph
+                            print(f"First paragraph for {leader['first_name']} {leader['last_name']}: {first_paragraph}")
 
     # Test to_json_file method
     filepath = 'leaders_data.json'

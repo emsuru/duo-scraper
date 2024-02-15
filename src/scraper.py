@@ -7,7 +7,6 @@ from opentelemetry import trace
 
 tracer = trace.get_tracer("mytracer")
 
-
 class WikipediaScraper:
     """
     A scraper class for fetching and processing data from Wikipedia and a specific API for country leaders.

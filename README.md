@@ -12,5 +12,16 @@ to activate the envv:
 To install the required packages, run the following command:
 
   ```bash
-  pip install -r requirements.txt
+  pip3 install -r requirements.txt
   ```
+## Usage
+
+To run the program, execute the following command:
+
+  ```bash
+  export OTEL_SERVICE_NAME="wikipedia-scraper"
+  export HONEYCOMB_API_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # get it from https://ui.honeycomb.io/
+  opentelemetry-instrument python3 main.py
+  ```
+
+  
