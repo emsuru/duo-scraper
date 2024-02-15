@@ -1,16 +1,68 @@
-# wikipedia-scraper 🚧 WORK-IN-PROGRESS 🚧
-This program queries an API to obtain a list of countries and their past political leaders. It then extracts & sanitizes their short bios from Wikipedia. Finally,the program then saves the data to disk.
+# Duo Scraper
 
-to create the env:
+[![forthebadge made-with-python](https://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+
+The Duo Scraper builds a JSON file with the political leaders of each country found at [this API](https://country-leaders.onrender.com/docs).
+
+The Scraper performs a double scraping task, hence the name "duo":
+
+1. data colection from APIs endpoints:
+   
+     -- the Scraper first queries a sequence of API endpoints to obtain a list of countries & basic info about their past political leaders.
+   
+3. data collection from HMTL endpoints:
+   
+     -- the Scraper then uses the wikipedia urls retrieved from the API to extract & sanitize the leaders' short bios from Wikipedia html pages
+
+The combined information is written in an output JSON file.
+
+## Setup 
+   
+- Create a new virtual environment by executing this command in your terminal:
+   
 `python3 -m venv wikipedia_scraper_env`
 
-to activate the envv:
+- Activate the environment by executing this command in your terminal:
+   
 `source wikipedia_scraper_env/bin/activate`
 
 ## Installation
 
-To install the required packages, run the following command:
+Install the required packages by executing the following command in your terminal:
 
   ```bash
   pip install -r requirements.txt
   ```
+## Usage
+
+To run the program, clone this repo on your local machine, then navigate to its directory in your terminal and execute:
+```bash
+python3 main.py
+```
+
+## Project background
+
+This project was submitted as my second solo project in the AI Bootcamp in Ghent, Belgium, 2024.
+
+Its main goals were to practice:
+
+- using virtual environments
+- extracting data from APIs and from HTML
+- using exception handling
+- getting comfortable with JSON 
+- using OOP
+- using regex to clean text data
+
+This project was completed over the course of 3 days in February 2024.
+
+My main challenges and opportunities to learn while doing the project were:
+
+- handling cookies and sessions when performing GET requests
+- handling various tags when parsing html to get the required content
+- using concurency to reduce runtime
+
+---
+
+Thanks for visiting my project page! 
+
+Connect with me on [LinkedIn](https://www.linkedin.com/in/mirunasuru/).
