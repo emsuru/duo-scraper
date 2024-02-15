@@ -55,6 +55,10 @@ Its main goals were to practice:
 
 This project was completed over the course of 3 days in February 2024.
 
+
+![data](https://camo.githubusercontent.com/3fbf9fe8569e07e446820a43eddc4be7841d94c6a977c38379760f36459244b7/68747470733a2f2f692e70696e696d672e636f6d2f6f726967696e616c732f30662f63322f31662f30666332316663643637336637393463316436323232623137373031333334322e706e67)
+
+
 My main challenges and opportunities to learn while doing the project were:
 
 - handling cookies and sessions when performing GET requests
@@ -66,3 +70,4 @@ My main challenges and opportunities to learn while doing the project were:
 Thanks for visiting my project page! 
 
 Connect with me on [LinkedIn](https://www.linkedin.com/in/mirunasuru/).
+
