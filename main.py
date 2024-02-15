@@ -1,7 +1,43 @@
 from src.scraper import WikipediaScraper  # Import the WikipediaScraper class from the scraper module within the src package.
-from opentelemetry import trace
+from opentelemetry import trace, context
+import concurrent.futures
 
 tracer = trace.get_tracer("mytracer")
+
+def process_country(country, scraper, parent_context):
+    token = context.attach(parent_context)
+    try:
+        with tracer.start_as_current_span("each_country"):
+            current_span = trace.get_current_span()
+            print(f"Processing country: {country}, Current Span ID: {current_span.get_span_context().span_id}, Trace ID: {current_span.get_span_context().trace_id}")
+            current_span.set_attribute("country", country)
+            scraper.get_leaders(country)
+            #print(f"Leaders of {country}: {scraper.leaders_data[country]}")
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor2:
+                # Capture the current context
+                parent_context = context.get_current()
+                # Pass the captured context along with other arguments
+                futures = []
+                for leader in scraper.leaders_data[country]:
+                    future = executor2.submit(process_leader, leader, scraper, parent_context)
+                    process_leader(leader, scraper, context.get_current())
+                    futures.append(future)
+                concurrent.futures.wait(futures)
+
+    finally:
+        context.detach(token)                
+
+def process_leader(leader, scraper, parent_context):
+    token = context.attach(parent_context)
+    try:
+        with tracer.start_as_current_span("process_leader"):
+            if 'wikipedia_url' in leader and leader['wikipedia_url']:
+                first_paragraph = scraper.get_paragraph_containing_names(leader['wikipedia_url'], leader['first_name'], leader['last_name'])
+                leader['first_paragraph'] = first_paragraph
+                #print(f"First paragraph for {leader['first_name']} {leader['last_name']}: {first_paragraph}")
+    finally:
+        context.detach(token)                
 
 @tracer.start_as_current_span("main")
 def main():
@@ -24,25 +60,17 @@ def main():
 
     # Check if the 'countries' variable is not None and contains at least one country.
     # This ensures that the following code block only executes if there is data to process.
+    # No changes needed here for capturing the context before submitting tasks
     if countries:
-        # Iterate over each country in the list of countries.
-        for country in countries:
-            with tracer.start_as_current_span("each_country"):
-                # Call the get_leaders method on the scraper object to fetch leaders' data for the current country.
-                # The data is stored within the scraper object's leaders_data attribute.
-                scraper.get_leaders(country)
-                # Print the leaders' data for the current country to verify that it has been fetched successfully.
-                print(f"Leaders of {country}: {scraper.leaders_data[country]}")
-
-                # Iterate over each leader in the list of leaders for the current country.
-                for leader in scraper.leaders_data[country]:
-                    with tracer.start_as_current_span("each_leader"):
-                        # Check if the leader has a 'wikipedia_url' key and that it is not empty.
-                        # This ensures that we only attempt to fetch data for leaders with a valid Wikipedia URL.
-                        if 'wikipedia_url' in leader and leader['wikipedia_url']:
-                            first_paragraph = scraper.get_paragraph_containing_names(leader['wikipedia_url'], leader['first_name'], leader['last_name'])
-                            leader['first_paragraph'] = first_paragraph
-                            print(f"First paragraph for {leader['first_name']} {leader['last_name']}: {first_paragraph}")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            # Capture the current context
+            parent_context = context.get_current()
+            # Pass the captured context along with other arguments
+            futures = []
+            for country in countries:
+                future = executor.submit(process_country, country, scraper, parent_context)
+                futures.append(future)
+            concurrent.futures.wait(futures)
 
     # Test to_json_file method
     filepath = 'leaders_data.json'

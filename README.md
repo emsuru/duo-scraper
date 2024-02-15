@@ -23,5 +23,3 @@ To run the program, execute the following command:
   export HONEYCOMB_API_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # get it from https://ui.honeycomb.io/
   opentelemetry-instrument python3 main.py
   ```
-
-  
