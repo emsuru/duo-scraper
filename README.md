@@ -63,11 +63,17 @@ My main challenges and opportunities to learn while doing the project were:
 
 - handling cookies and sessions when performing GET requests
 - handling various tags when parsing html to get the required content
-- using concurency to reduce runtime
+
+## Extra
+
+As part of the class project's "nice-to-have" requirements, I created a separate repo branch for upgrades called `feature/o11y`.
+In there I experiment with concurrency to improve runtime and with observability (o11y) via Honeycomb.
+
+Shoutout to [1101](https://github.com/one1zero1one) for his advice and help with these experiments.
 
 ---
 
 Thanks for visiting my project page! 
 
-Connect with me on [LinkedIn](https://www.linkedin.com/in/mirunasuru/).
+Connect with me on [LinkedIn](https://www.linkedin.com/in/mirunasuru/) 🤍
 
