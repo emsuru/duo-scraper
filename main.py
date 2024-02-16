@@ -37,10 +37,15 @@ def main() -> None:
                     leader['first_paragraph'] = first_paragraph
                     print(f"First paragraph for {leader['first_name']} {leader['last_name']}: {first_paragraph}")
 
-    # Test to_json_file method
-    filepath = 'leaders_data.json'
-    scraper.to_json_file(filepath)
-    print(f"Data saved to {filepath}")
+    # Save the scraped data to a JSON file.
+    filepath_json = 'leaders_data.json'
+    scraper.to_json_file(filepath_json)
+    print(f"Data saved to {filepath_json}")
+
+    # Save the scraped data to a CSV file.
+    filepath_csv = 'leaders_data.csv'
+    scraper.to_csv_file(filepath_csv)
+    print(f"Data saved to {filepath_csv}")
 
 if __name__ == "__main__":
     main()

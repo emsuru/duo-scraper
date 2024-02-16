@@ -9,35 +9,35 @@ The Duo Scraper builds a JSON file with the political leaders of each country fo
 The Scraper performs a double scraping task, hence the name "duo":
 
 1. data colection from APIs endpoints:
-   
+
      -- the Scraper first queries a sequence of API endpoints to obtain a list of countries & basic info about their past political leaders.
-   
+
 3. data collection from HMTL endpoints:
-   
+
      -- the Scraper then uses the wikipedia urls retrieved from the API to extract & sanitize the leaders' short bios from Wikipedia html pages
 
 The combined information is written in an output JSON file.
 
-## 🛠️ Setup 
-   
+## 🛠️ Setup
+
 - Create a new virtual environment by executing this command in your terminal:
-   
+
 `python3 -m venv wikipedia_scraper_env`
 
 - Activate the environment by executing this command in your terminal:
-   
+
 `source wikipedia_scraper_env/bin/activate`
 
 ## ⚙️ Installation
 
-Install the required packages by executing the following command in your terminal:
+Install the required packages and necessary dependencies by executing the following command in your terminal:
 
   ```bash
   pip install -r requirements.txt
   ```
 ## 👩‍💻 Usage
 
-To run the program, clone this repo on your local machine, then navigate to its directory in your terminal and execute:
+To run the program, clone this repo on your local machine, make sure you have first executed your requirements.txt by following the commad mentioned above in the installation, then navigate to its directory in your terminal and execute:
 ```bash
 python3 main.py
 ```
@@ -51,7 +51,7 @@ Its main goals were to practice:
 - using virtual environments
 - extracting data from APIs and from HTML
 - using exception handling
-- getting comfortable with JSON 
+- getting comfortable with JSON
 - using OOP
 - using regex to clean text data
 
@@ -79,14 +79,14 @@ Shoutout to [11011](https://github.com/one1zero1one) for his advice and help wit
 All my code is currently *heavily*:
 
 - docstringed
-- typed
 - commented
 
-This is to help me learn and for my feedback sessions with our coach.
+.. and sometimes typed.
+
+This is to help me learn and to make my sessions with our training coach more efficient.
 
 ---
 
-Thanks for visiting my project page! 
+Thanks for visiting my project page!
 
 Connect with me on [LinkedIn](https://www.linkedin.com/in/mirunasuru/) 🤍
-

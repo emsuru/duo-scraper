@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import json
 import re
+import pandas as pd
 
 class WikipediaScraper:
     """A scraper class to fetch data from a web API and Wikipedia."""
@@ -140,3 +141,27 @@ class WikipediaScraper:
             print(f"Data successfully saved to {filepath}")  # Confirm successful save.
         except IOError as e:
             print(f"An error occurred while writing to the file: {e}")  # Handle file I/O exceptions.
+
+    def to_csv_file(self, filepath) -> None:
+        """
+        Writes the leaders_data dictionary to a CSV file at the specified filepath using Pandas.
+
+        Args:
+            filepath: The path to the file where the data will be saved.
+        """
+        try:
+            # Convert the leaders_data dictionary to a list of dictionaries
+            data = []
+            for country, leaders in self.leaders_data.items():
+                for leader in leaders:
+                    leader['country'] = country  # Add country information to each leader
+                    data.append(leader)
+
+            # Create a DataFrame from the list of dictionaries
+            df = pd.DataFrame(data)
+
+            # Write the DataFrame to a CSV file
+            df.to_csv(filepath, index=False, encoding='utf-8')
+            print(f"Data successfully saved to {filepath}")
+        except Exception as e:
+            print(f"An error occurred while writing to the file: {e}")
