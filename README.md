@@ -20,8 +20,6 @@ To run the program, execute the following command:
 
   ```bash
   export OTEL_SERVICE_NAME="wikipedia-scraper"
-  export HONEYCOMB_API_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # get it from https://ui.honeycomb.io/
+  export HONEYCOMB_API_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # get your free key from https://ui.honeycomb.io/
   opentelemetry-instrument python3 main.py
   ```
-
-  
