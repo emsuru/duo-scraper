@@ -21,7 +21,6 @@ def process_country(country, scraper, parent_context):
                 futures = []
                 for leader in scraper.leaders_data[country]:
                     future = executor2.submit(process_leader, leader, scraper, parent_context)
-                    process_leader(leader, scraper, context.get_current())
                     futures.append(future)
                 concurrent.futures.wait(futures)
 
