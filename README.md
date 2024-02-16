@@ -2,6 +2,8 @@
 
 [![forthebadge made-with-python](https://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
+## 📖 Description
+
 The Duo Scraper builds a JSON file with the political leaders of each country found at [this API](https://country-leaders.onrender.com/docs).
 
 The Scraper performs a double scraping task, hence the name "duo":
@@ -16,7 +18,7 @@ The Scraper performs a double scraping task, hence the name "duo":
 
 The combined information is written in an output JSON file.
 
-## Setup 
+## 🛠️ Setup 
    
 - Create a new virtual environment by executing this command in your terminal:
    
@@ -26,21 +28,21 @@ The combined information is written in an output JSON file.
    
 `source wikipedia_scraper_env/bin/activate`
 
-## Installation
+## ⚙️ Installation
 
 Install the required packages by executing the following command in your terminal:
 
   ```bash
   pip install -r requirements.txt
   ```
-## Usage
+## 👩‍💻 Usage
 
 To run the program, clone this repo on your local machine, then navigate to its directory in your terminal and execute:
 ```bash
 python3 main.py
 ```
 
-## Project background
+## 📂 Project background
 
 This project was submitted as my second solo project in the AI Bootcamp in Ghent, Belgium, 2024.
 
@@ -71,6 +73,16 @@ As part of the class project's "nice-to-have" requirements, I created a separate
 I also created a third branch for the project called `feature/o11y` where I experiment with alternative concurrency methods and observability (o11y) via Honeycomb.
 
 Shoutout to [11011](https://github.com/one1zero1one) for his advice and help with these experiments.
+
+## ⚠️ Warning
+
+All my code is currently *heavily*:
+
+- docstringed
+- typed
+- commented
+
+This is to help me learn and for my feedback sessions with our coach.
 
 ---
 
