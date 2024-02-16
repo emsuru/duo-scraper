@@ -5,198 +5,138 @@ import json
 import re
 
 class WikipediaScraper:
-    """
-    A scraper class for fetching and processing data from Wikipedia and a specific API for country leaders.
-    Attributes:
-        base_url (str): The base URL for the API to fetch leaders' data.
-        leaders_endpoint (str): The endpoint at the API for fetching leaders.
-        cookies_endpoint (str): The endpoint at the API for refreshing cookies.
-        cookie (RequestsCookieJar): Cookies returned by the API for session management.
-        leaders_data (dict): A dictionary to store leaders' data keyed by country.
-    """
-    def __init__(self):
-        """
-        Initializes the WikipediaScraper with default values.
-        """
-        self.base_url = "https://country-leaders.onrender.com"
-        self.country_endpoint = "/countries"
-        self.leaders_endpoint = "/leaders"
-        self.cookies_endpoint = "/cookie"
-        self.leaders_data = {}  # Initialize an empty dictionary to store leaders' data keyed by country.
-        self.cookie = None  # Initialize the cookie attribute to None.
+    """A scraper class to fetch data from a web API and Wikipedia."""
 
-    def refresh_cookie(self):
+    def __init__(self) -> None:
         """
-        Refreshes the session cookie required for making requests to the API.
+        Initializes the WikipediaScraper with base URLs and endpoints.
+        Also starts a session and refreshes the cookie for authentication.
+
+        Attributes:
+            base_url: The base URL of the web API.
+            country_endpoint: The endpoint to fetch a list of countries.
+            leaders_endpoint: The endpoint to fetch leaders' data for a specific country.
+            cookies_endpoint: The endpoint to refresh the session cookie.
+            leaders_data: A dictionary to store leaders' data keyed by country.
+            session: A requests session to handle HTTP requests.
+
+        Methods:
+            refresh_cookie: Refreshes the session cookie by making a GET request to the cookie endpoint.
+            get_countries: Fetches a list of countries from the API.
+            get_leaders: Fetches leaders' data for a given country from the API and stores it in the leaders_data dictionary.
+            get_paragraph_containing_names: Fetches the first paragraph from a Wikipedia page that contains the given first and last names.
+            to_json_file: Writes the leaders_data dictionary to a JSON file at the specified filepath.
         """
-        cookie_url = f"{self.base_url}{self.cookies_endpoint}" # Construct the full URL for the cookie endpoint.
+        self.base_url: str = "https://country-leaders.onrender.com"
+        self.country_endpoint: str = "/countries"
+        self.leaders_endpoint: str = "/leaders"
+        self.cookies_endpoint: str = "/cookie"
+        self.leaders_data = {}  # Dictionary to hold the fetched leaders' data.
+        self.session = requests.Session()  # Start a session for making HTTP requests.
+        self.refresh_cookie()  # Refresh the session cookie upon initialization.
+
+    def refresh_cookie(self) -> None:
+        """
+        Refreshes the session cookie by making a GET request to the cookie endpoint.
+        """
+        cookie_url: str = f"{self.base_url}{self.cookies_endpoint}" # Construct the full URL for the cookie endpoint.
         try:
-            response = requests.get(cookie_url)  # Make a GET https request to the cookie endpoint to obtain a new cookie.
-            response.raise_for_status()  # # Check if the request was successful (status code 200). Will raise an HTTPError if the request returned an unsuccessful status code
-            self.cookie = response.cookies  # Update the cookie attribute with the new cookie from the response.
+            response = self.session.get(cookie_url)  # Attempt to get a new cookie from the API.
+            response.raise_for_status()  # Raise an exception if the request was unsuccessful.
         except RequestException as e:
-            print(f"An error occurred while refreshing cookie: {e}") # Print an error message if an exception occurs (e.g., network problem, invalid URL).
-            self.cookie = None # This refreshes the cookie
-        pass
+            print(f"An error occurred while refreshing cookie: {e}")  # Handle exceptions such as network errors.
 
     def get_countries(self):
         """
         Fetches a list of countries from the API.
-        This method constructs a URL by appending the country endpoint to the base URL,
-        then makes a GET request to that URL. If the request is successful, it parses
-        the response as JSON and returns the resulting list. If any request-related
-        error occurs, it prints an error message and returns None.
 
         Returns:
-            list: A list of countries if the request is successful, None otherwise.
+            A list of countries or None if an error occurs.
         """
-        # Construct the full URL for fetching countries by appending the country endpoint to the base URL
-        countries_url = f"{self.base_url}{self.country_endpoint}"
+        self.refresh_cookie()
+        countries_url: str = f"{self.base_url}{self.country_endpoint}"
         try:
-            # Make a GET request to the constructed URL, passing the stored cookie for authentication
-            response = requests.get(countries_url, cookies=self.cookie)
-            # Raise an exception if the request was unsuccessful (e.g., network error, 404 not found, etc.)
-            response.raise_for_status()
-            # Parse the response content as JSON, which is expected to be a list of countries
-            countries = response.json()
-            # Return the list of countries
+            response = self.session.get(countries_url)  # Make the request to the API.
+            response.raise_for_status()  # Check for a successful response.
+            countries = response.json()  # Parse the JSON response into a list.
             return countries
         except RequestException as e:
-            # If a request exception occurs, print an error message with the exception details
-            print(f"An error occurred while getting countries: {e}")
-            # Return None to indicate that the request was unsuccessful
+            print(f"An error occurred while getting countries: {e}")  # Handle exceptions and return None if an error occurs.
             return None
-        # The 'pass' statement is unnecessary here and can be removed
 
-    def get_leaders(self, country):
+    def get_leaders(self, country: str) -> None:
         """
-        Fetches leaders for a given country from the API and stores their data.
-        This method constructs a URL for fetching leaders, checks if the cookie is set,
-        and if not, refreshes it. It then makes a GET request with the country as a parameter.
-        If the request is successful, it updates the leaders_data dictionary with the response.
-        If a 403 error occurs, indicating an expired or invalid cookie, it refreshes the cookie
-        and retries the request. If any other request-related error occurs, it logs the error
-        and sets the country's leaders data to an empty list.
+        Fetches leaders' data for a given country from the API and stores it in the leaders_data dictionary.
 
         Args:
-            country (str): The country for which to fetch leaders.
-
-        Updates:
-            self.leaders_data: Updates the dictionary with the leaders' data for the given country.
+            country: The name of the country for which to fetch leaders' data.
         """
-        # Construct the full URL for fetching leaders by appending the leaders endpoint to the base URL
-        leaders_url = f"{self.base_url}{self.leaders_endpoint}"
-        # Check if the cookie is set, if not, call the method to refresh it
-        if not self.cookie:
-            self.refresh_cookie()
+        self.refresh_cookie()
+        leaders_url: str = f"{self.base_url}{self.leaders_endpoint}"
         try:
-            # Make a GET request to the constructed URL, passing the stored cookie and the country as a parameter
-            response = requests.get(leaders_url, cookies=self.cookie, params={'country': country})
-            # Raise an exception if the request was unsuccessful
-            response.raise_for_status()
-            # Parse the response content as JSON and update the leaders_data dictionary with the data for the given country
-            self.leaders_data[country] = response.json()
-        except requests.exceptions.HTTPError as e:
-            # If a 403 HTTP error occurs, it indicates that the cookie has expired or is invalid
-            if e.response.status_code == 403:
-                # Inform the user that the cookie is being refreshed
-                print("Cookie expired or invalid, refreshing cookie and retrying...")
-                # Refresh the cookie
-                self.refresh_cookie()
-                # Retry the GET request with the new cookie
-                response = requests.get(leaders_url, cookies=self.cookie, params={'country': country})
-                # If the retry is successful, update the leaders_data dictionary
-                if response.status_code == 200:
-                    self.leaders_data[country] = response.json()
-                else:
-                    # If the retry is unsuccessful, log the failure and set the country's leaders data to an empty list
-                    print(f"Failed to get leaders after refreshing cookie: {response.status_code}")
-                    self.leaders_data[country] = []
+            response = self.session.get(leaders_url, params={'country': country})  # Make the request with the country parameter.
+            response.raise_for_status()  # Raise HTTPError if the HTTP request returned an unsuccessful status code.
+            self.leaders_data[country] = response.json()  # Parse the JSON response and store the result in the leaders_data dictionary under the country key.
         except RequestException as e:
-            # If any other request exception occurs, log the error and set the country's leaders data to an empty list
-            print(f"An error occurred while getting leaders for {country}: {e}")
+            print(f"An error occurred while getting leaders for {country}: {e}")  # Handle exceptions and store an empty list if an error occurs.
             self.leaders_data[country] = []
-        # The 'pass' statement is unnecessary here and can be removed
 
-    def get_paragraph_containing_names(self, wikipedia_url, first_name, last_name):
-        """
-        Fetches and returns the first paragraph that contains both the first name and the last name from a Wikipedia page.
-        This method makes a GET request to the provided Wikipedia URL, parses the response content using BeautifulSoup
-        to find all paragraphs, and returns the text of the first paragraph that contains both the first name and the last name.
-        If the request fails or no such paragraph is found, it logs an error and returns an empty string.
-
-        Args:
-            wikipedia_url (str): The URL of the Wikipedia page to scrape.
-            first_name (str): The first name to search for within the paragraphs.
-            last_name (str): The last name to search for within the paragraphs.
-
-        Returns:
-            str: The first paragraph containing both the first name and the last name on the Wikipedia page, or an empty string if not found.
-        """
+    def get_paragraph_containing_names(self, wikipedia_url, first_name, last_name) -> str:
+        # Scrape the first paragraph from a Wikipedia page that contains the specified names.
         try:
-            # Make a GET request to the provided Wikipedia URL
-            response = requests.get(wikipedia_url)
-            # Raise an exception if the request was unsuccessful
+            # Send a GET request to the Wikipedia page URL.
+            response = self.session.get(wikipedia_url)
+            # If the response status code indicates a problem (4xx or 5xx), raise an HTTPError exception.
             response.raise_for_status()
-            # Parse the response content using BeautifulSoup to navigate the HTML structure
+            # Use BeautifulSoup to parse the HTML content of the page for data extraction.
+            # The 'html.parser' argument specifies the parser to use for parsing the HTML content.
             soup = BeautifulSoup(response.content, 'html.parser')
-            # Attempt to find all paragraphs by looking for the 'p' tags within the main content of the page
-            # The main content can be identified by the 'mw-content-text' ID or 'mw-parser-output' class
-            content = soup.find(id='mw-content-text') or soup.find(class_='mw-parser-output')
-
-            # Find all 'p' tags in the content
+            # Attempt to find the main content area of the Wikipedia page by ID or class name (inspect page to find the right class name in the source html).
+            content = soup.find(id='mw-content-text') or soup.find(class_='rt-commentedText nowrap')
+            # If the main content area is found, retrieve all paragraph elements; otherwise, set to an empty list.
             paragraphs = content.find_all('p') if content else []
-
+            # Initialize a variable to hold the first non-empty paragraph text, starting as None.
             first_non_empty_paragraph = None
-            # Iterate through the found paragraphs to find the first one that contains both the first name and the last name
+            # Iterate through each paragraph element found in the main content area.
             for paragraph in paragraphs:
-                # Get the text content of the paragraph, stripping whitespace
+                # Get the text content of the paragraph, stripping leading and trailing whitespace.
                 paragraph_text = paragraph.get_text(strip=True)
-                # Use a regular expression to remove citation numbers (e.g., [1], [2], etc.)
+                # Use a regular expression to remove citation numbers (e.g., "[1]") from the paragraph text.
                 clean_text = re.sub(r'\[\d+\]', '', paragraph_text)
-
-                # Store the first non-empty paragraph in case no paragraph containing both names is found
+                # If we haven't stored a non-empty paragraph yet and the current paragraph has text, store it.
                 if not first_non_empty_paragraph and clean_text:
                     first_non_empty_paragraph = clean_text
-
-                # Check if the paragraph contains both the first name and the last name
-                if last_name == "None" or last_name is None:
+                # Check if the paragraph contains the first name and, if applicable, the last name.
+                # If 'last_name' is None or the string "None", only check for 'first_name'.
+                if last_name is None or last_name == "None":
                     if first_name in clean_text:
                         return clean_text
                 else:
+                    # If both first and last names are provided and present in the paragraph, return it.
                     if first_name in clean_text and last_name in clean_text:
                         return clean_text
-
-            # If no paragraph containing both names is found, return the first non-empty paragraph
+            # If no paragraph containing the names is found, return the first non-empty paragraph.
             if first_non_empty_paragraph:
                 return first_non_empty_paragraph
             else:
-                # If there are no non-empty paragraphs, log an error and return an empty string
+                # If no non-empty paragraphs are found, log a message and return an empty string.
                 print(f"No non-empty paragraph found for URL: {wikipedia_url}")
                 return ""
         except RequestException as e:
-            # If a request exception occurs, log the error and return an empty string
+            # If a RequestException occurs (e.g., network issues), log the error and return an empty string.
             print(f"An error occurred while getting paragraphs from Wikipedia: {e}")
             return ""
-    def to_json_file(self, filepath):
+
+    def to_json_file(self, filepath) -> None:
         """
-        Saves the collected leaders' data to a JSON file.
-        This method opens the specified file in write mode, dumps the leaders_data dictionary
-        into the file as JSON, and logs a success message. If an error occurs while writing to the file,
-        it logs an error message.
+        Writes the leaders_data dictionary to a JSON file at the specified filepath.
 
         Args:
-            filepath (str): The path to the file where the data should be saved.
+            filepath: The path to the file where the data will be saved.
         """
         try:
-            # Open the specified file in write mode with UTF-8 encoding
             with open(filepath, 'w', encoding='utf-8') as file:
-                # Dump the leaders_data dictionary into the file as a JSON-formatted string
-                # 'ensure_ascii=False' allows for non-ASCII characters to be written
-                # 'indent=4' makes the output more readable by adding indentation to the JSON structure
-                json.dump(self.leaders_data, file, ensure_ascii=False, indent=4)
-            # Log a success message indicating where the data was saved
-            print(f"Data successfully saved to {filepath}")
+                json.dump(self.leaders_data, file, ensure_ascii=False, indent=4)  # Serialize and save the data to the file.
+            print(f"Data successfully saved to {filepath}")  # Confirm successful save.
         except IOError as e:
-            # If an IOError occurs (e.g., file not found, permission denied), log an error message with the exception details
-            print(f"An error occurred while writing to the file: {e}")
+            print(f"An error occurred while writing to the file: {e}")  # Handle file I/O exceptions.
