@@ -30,14 +30,14 @@ python3 -m venv wikipedia_scraper_env
 source wikipedia_scraper_env/bin/activate
 ```
 
-3. install the required packages and necessary dependencies by executing the following command in your terminal:
+3. install the required dependencies by executing this command in your terminal:
 
   ```bash
   pip install -r requirements.txt
   ```
 ## 👩‍💻 Usage
 
-To run the program, clone this repo on your local machine, navigate to its directory in your terminal, make sure you have first execute your requirements.txt first, then execute:
+To run the program, clone this repo on your local machine, navigate to its directory in your terminal, make sure you have first executed your requirements.txt, then execute:
 
 ```bash
 python3 main.py
@@ -45,7 +45,7 @@ python3 main.py
 
 ## 📂 Project background
 
-This project was submitted as my second solo project in the AI Bootcamp in Ghent, Belgium, 2024.
+This was my second solo project in the AI Bootcamp in Ghent, Belgium, 2024.
 
 Its main goals were to practice:
 
