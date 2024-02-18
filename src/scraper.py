@@ -84,6 +84,8 @@ class WikipediaScraper:
 
     def get_paragraph_containing_names(self, wikipedia_url, first_name, last_name) -> str:
         # Scrape the first paragraph from a Wikipedia page that contains the specified names.
+        # This has given me headaches;  I tried at least 5 things that didn't work
+        # I finally settled on searching for first paragraph that contains both fname and lname, this seems to extract data for most target pages in the exercise
         try:
             # Send a GET request to the Wikipedia page URL.
             response = self.session.get(wikipedia_url)
